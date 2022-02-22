@@ -149,4 +149,5 @@ app.get("/orders", (req, res) => {
          res.status(404).send("No orders found");
       }
    });
+   client.end;
 });
