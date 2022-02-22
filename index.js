@@ -2,7 +2,7 @@ const client = require("./db.js");
 const express = require("express");
 const bodyParser = require("body-parser");
 const { UNIQUE_VIOLATION } = require("pg-error-constants");
-const md5 = require('md5');
+const md5 = require("md5");
 const app = express();
 app.use(bodyParser.json());
 
@@ -15,8 +15,12 @@ client.connect();
 app.post("/registration", (req, res) => {
    const registration = req.body;
    const insertQuery = `insert into users(user_name, email, password, gender, age) 
-                       values('${registration.user_name}', '${registration.email}', 
-                       '${md5(registration.password)}','${registration.gender}','${registration.age}')`;
+                       values('${
+                          registration.user_name
+                       }', '${registration.email}', 
+                       '${md5(registration.password)}','${
+      registration.gender
+   }','${registration.age}')`;
    client.query(insertQuery, (err, result) => {
       if (!err) {
          res.send("Successfully Registered");
@@ -115,6 +119,38 @@ app.post("/login", (req, res) => {
                res.send("No user found");
             }
          }
+      }
+   });
+});
+
+app.post("/order", (req, res) => {
+   const order = req.body;
+   const userId = req.body.user_id;
+   const productId = req.body.product_id;
+   const placeOrder = `insert into orders(user_id, product_id) 
+                       values(${userId}, ${productId})`;
+
+   client.query(placeOrder, (err, results) => {
+      if (!err) {
+         res.send("Order created successfully");
+      } else {
+         console.log(err);
+         // res.send(err);
+      }
+   });
+   client.end;
+});
+
+app.get("/orders", (req, res) => {
+   const allOrders = ` select orders.order_id, orders.user_id, orders.product_id, users.user_name, users.user_id, 
+                        product.product_id, product.product_name, product.product_price from orders 
+                        join users on orders.user_id = users.user_id 
+                        join product on orders.product_id = product.product_id`;
+   client.query(allOrders, (err, result) => {
+      if (!err) {
+         res.send(result.rows);
+      } else {
+         res.send(err);
       }
    });
 });

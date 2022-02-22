@@ -1,12 +1,12 @@
 CREATE DATABASE devtask;
 
-CREATE TABLE registration(
-   user_id SERIAL PRIMARY KEY,
-   u_name varchar(255),
-   email varchar(255),
-   pass varchar(255),
-   gender varchar(255),
-   age varchar(255)
+CREATE TABLE users (
+  id serial primary key,
+  user_name varchar(40),
+  email citext not null unique,
+  password varchar not null,
+  gender varchar(10),
+  age int 
 );
 
 CREATE TABLE category(
@@ -22,8 +22,17 @@ CREATE TABLE product(
    product_name VARCHAR(255) NOT NULL,
    product_image VARCHAR(15),
    description VARCHAR(100),
+   price int,
    PRIMARY KEY(product_id),
    CONSTRAINT fk_category
       FOREIGN KEY(category_id) 
 	  REFERENCES category(category_id)
 );
+
+CREATE TABLE orders(
+	order_id serial primary key,
+	user_id int not null,
+	product_id int not null,
+	FOREIGN KEY(user_id) REFERENCES users(user_id),
+	FOREIGN KEY(product_id) REFERENCES product(product_id)
+)
